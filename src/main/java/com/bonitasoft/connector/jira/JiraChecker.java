@@ -62,7 +62,6 @@ public class JiraChecker {
         final NullProgressMonitor pm = new NullProgressMonitor();
         SearchResult result = jiraClient.searchJql(query.format(new Object[]{version}), 1, 0, pm);
         return result.getTotal();
-        //return jiraIssueExtractor.countResult(query.format(new Object[]{version}));
     }
 
     private String toCSV(String[] versions) {
