@@ -45,12 +45,14 @@ public class JiraChecker {
         int i = 1;
         StringBuffer sb = new StringBuffer();
         for (MessageFormat query : queries) {
+            System.out.println("Executing Query: " + i + "/" + queries.length);
             for (String version : versions) {
                 int matchingResults = getResult(query, version);
                 if (matchingResults > 0) {
                     sb.append(i).append(") ").append(version).append(" --> ").append(matchingResults).append("\n");
                 }
             }
+            sb.append("\n");
             i++;
         }
         return sb.toString();
@@ -74,29 +76,75 @@ public class JiraChecker {
         return sb.toString();
     }
 
-    private void check(String[] versions, MessageFormat[] queries) {
+    private void check(String[] docVersions, String[] migrationVersions, String[] productVersions, String[] queryNames, MessageFormat[] queries) {
         MessageFormat form = new MessageFormat("Bonjour Jira Checkers, \n\n Nous sommes le {0}. \n\n Liste des released versions: \n\n {1}\n\n " +
-                "Les requetes sont: \n {2}\n\n Les requetes qui retournent des résultats sont: \n {3} \n\n Bon nettoyage!");
+                "Les requetes sont: \n {2}\n\n Les requetes qui retournent des résultats sont: \n\n {3} \n\n Bon nettoyage!");
 
         Date now = new Date();
 
-        String versionsCSV = toCSV(versions);
+        String versionsList = buildVersionsList(docVersions, migrationVersions, productVersions);
 
-        String queriesList = buildQueriesList(queries);
+        String queriesList = buildQueriesList(queryNames, queries);
+
+        String[] versions = mergeVersions(docVersions, migrationVersions, productVersions);
+
 
         String resultList = buildResultList(queries, versions);
 
-        String body = form.format(new Object[]{now, versionsCSV, queriesList, resultList});
+        String body = form.format(new Object[]{now, versionsList, queriesList, resultList});
 
         System.err.println(body);
     }
 
+    String[] mergeVersions(String[] docVersions, String[] migrationVersions, String[] productVersions) {
+        String[] docAndMigrationVersions = new String[docVersions.length + migrationVersions.length];
+        System.arraycopy(docVersions, 0, docAndMigrationVersions, 0, docVersions.length);
+        System.arraycopy(migrationVersions, 0, docAndMigrationVersions, docVersions.length, migrationVersions.length);
 
-    private String buildQueriesList(MessageFormat[] queries) {
+        String[] allVersions = new String[docAndMigrationVersions.length + productVersions.length];
+        System.arraycopy(docAndMigrationVersions, 0, allVersions, 0, docAndMigrationVersions.length);
+        System.arraycopy(productVersions, 0, allVersions, docAndMigrationVersions.length, productVersions.length);
+
+        return allVersions;
+    }
+
+    protected String buildVersionsList(String[] docVersions, String[] migrationVersions, String[] productVersions) {
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("Doc versions:\n");
+        sb.append("\t").append(toCSV(docVersions));
+
+        sb.append("\n").append("Migration versions:\n");
+        sb.append("\t").append(toCSV(migrationVersions));
+
+        sb.append("\n").append("Product versions:");
+
+
+        StringBuffer productVersionsSb = new StringBuffer();
+        String previousMinorVersion="";
+        for (String version : productVersions) {
+            String currentMinorVersion = version.substring(0,3);
+            if(currentMinorVersion.equals(previousMinorVersion)) {
+                productVersionsSb.append(",");
+            } else {
+                productVersionsSb.append("\n\t");
+                previousMinorVersion = currentMinorVersion;
+            }
+            productVersionsSb.append(version);
+        }
+
+        sb.append(productVersionsSb);
+
+        return sb.toString();
+
+    }
+
+
+    protected String buildQueriesList(String[] queryNames, MessageFormat[] queries) {
         int i = 1;
         StringBuffer sb = new StringBuffer();
         for (MessageFormat query : queries) {
-            sb.append(i).append(")").append("\t").append(query.toPattern()).append("\n");
+            sb.append(i).append(") ").append(queryNames[i-1]).append("\n").append("\t").append(query.toPattern()).append("\n");
             i++;
         }
         return sb.toString();
@@ -104,8 +152,13 @@ public class JiraChecker {
 
     public static void main(String[] args) {
         //,"6.4"
-        String[] queryNames = new String[]{};
-        String[] versions = new String[]{"1.0.0","1.1.0","1.1.1","1.1.2","1.2.0","1.3.0","1.3.1","1.4.0","1.5.0","1.6.0","1.7.0","1.8.0","1.8.1","1.9.0","1.10.0","1.11.0","1.12.0","1.13.0","Doc-6.0","Doc-6.1","Doc-6.2","Doc-6.3","Doc-6.4","6.0.0","6.0.1","6.0.2","6.0.3","6.0.4","6.1.0","6.1.1","6.1.2","6.2.0","6.2.1","6.2.2","6.2.3","6.2.4","6.2.5","6.2.6","6.3.0","6.3.1","6.3.2","6.3.3","6.3.4","6.3.5","6.3.6","6.3.7"};
+        String[] queryNames = new String[]{"missing affect version", "bugs with earliestAffectedVersion > fixVersion", "bugs with affectversion < earliestAffectedVersion", "bugs with wrong issueFiexdIn = Development", "bugs with wrong issueFiexdIn = Released version", "bugs with affectVersion > fixversion"};
+
+        String[] docVersions = new String[]{"Doc-6.0","Doc-6.1","Doc-6.2","Doc-6.3","Doc-6.4"};
+        String[] migrationVersions = new String[]{"1.0.0","1.1.0","1.1.1","1.1.2","1.2.0","1.3.0","1.3.1","1.4.0","1.5.0","1.6.0","1.7.0","1.8.0","1.8.1","1.9.0","1.10.0","1.11.0","1.12.0","1.13.0"};
+        String[] productVersions = new String[]{"6.0.0","6.0.1","6.0.2","6.0.3","6.0.4","6.1.0","6.1.1","6.1.2","6.2.0","6.2.1","6.2.2","6.2.3","6.2.4","6.2.5","6.2.6","6.3.0","6.3.1","6.3.2","6.3.3","6.3.4","6.3.5","6.3.6","6.3.7"};
+
+
         MessageFormat[] queries = new MessageFormat[]{
                 new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND (fixVersion > {0} OR fixVersion is EMPTY OR fixVersion = \"N/A\") AND \"Earliest Affected Version\" <= {0} AND affectedVersion != {0}")
                 ,
@@ -115,10 +168,12 @@ public class JiraChecker {
                 ,
                 new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND fixVersion = {0} AND \"Earliest Affected Version\" != {0} AND \"Issue impacting\" = Development")
                 ,
-                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND fixVersion = {0} AND \"Earliest Affected Version\" = {0} AND \"Issue impacting\" =  \"Released version\" "),
+                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND fixVersion = {0} AND \"Earliest Affected Version\" = {0} AND \"Issue impacting\" =  \"Released version\" ")
+                ,
+                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND affectedVersion = {0} AND fixVersion is not EMPTY and fixVersion != \"N/A\" AND ((fixVersion = {0} AND \"Issue impacting\" != \"Development\") OR fixVersion < {0}) ")
         };
 
-        new JiraChecker().check(versions, queries);
+        new JiraChecker().check(docVersions, migrationVersions, productVersions, queryNames, queries);
     }
 
 
