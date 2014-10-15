@@ -26,16 +26,11 @@ public class HasPropertyFileConfigurationTest {
 	}
 	
 	public static void ensureValidConfiguration() {
-		URL confFileURL = JiraIssueExtractorTest.class.getClassLoader().getResource("jiraExtractor.cfg");
+		URL confFileURL = HasPropertyFileConfigurationTest.class.getClassLoader().getResource("jiraExtractor.cfg");
 		final String filePath = confFileURL.getPath();
 		System.setProperty(CONFIGURATION_FILENAME_KEY, filePath);
 	}
 	
-	/**
-	 * Test method for {@link com.bonitasoft.connector.jira.JiraIssueExtractor#loadConfigurationFromFile()}.
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 */
 	@Test
 	public void testLoadConfigurationFromFileNominal() throws FileNotFoundException, IOException {
 		ensureValidConfiguration();
@@ -47,11 +42,6 @@ public class HasPropertyFileConfigurationTest {
 		Assertions.assertThat(propertyFileConfiguration.getConfiguration()).isNotEmpty();
 	}
 
-	/**
-	 * Test method for {@link com.bonitasoft.connector.jira.JiraIssueExtractor#loadConfigurationFromFile()}.
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 */
 	@Test(expected=IllegalStateException.class)
 	public void testLoadConfigurationFromFileNoPropertySet() throws FileNotFoundException, IOException {
 		clearSystemProperty();
@@ -60,11 +50,6 @@ public class HasPropertyFileConfigurationTest {
 	}
 
 	
-	/**
-	 * Test method for {@link com.bonitasoft.connector.jira.JiraIssueExtractor#loadConfigurationFromFile()}.
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 */
 	@Test(expected=FileNotFoundException.class)
 	public void testLoadConfigurationFromFileFileNotFound() throws FileNotFoundException, IOException {
 		// make sure the file will not be found.
