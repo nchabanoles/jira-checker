@@ -133,29 +133,8 @@ public class JiraChecker {
         return sb.toString();
     }
 
-    private void check(String[] docVersions, String[] migrationVersions, String[] productVersions, String[] queryNames, MessageFormat[] queries, String doubleQueryName, MessageFormat doubleQuery1, MessageFormat doubleQuery2) {
 
-        MessageFormat form = new MessageFormat("Bonjour Jira Checkers, \n\n Nous sommes le {0}. \n\n Liste des released versions: \n\n {1}\n\n " +
-                "Les requetes sont: \n {2}\n\n Les requetes qui retournent des résultats sont: \n\n {3} \n\n Bon nettoyage!");
-
-        Date now = new Date();
-
-        String versionsList = buildVersionsList(docVersions, migrationVersions, productVersions);
-
-        String queriesList = buildQueriesList(queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
-
-        String[] versions = mergeVersions(docVersions, migrationVersions, productVersions);
-
-
-        String resultList = buildResultList(queries, doubleQuery1, doubleQuery2, versions);
-
-
-        String body = form.format(new Object[]{now, versionsList, queriesList, resultList});
-
-        System.err.println(body);
-    }
-
-    String[] mergeVersions(String[] docVersions, String[] migrationVersions, String[] productVersions) {
+    protected  String[] mergeVersions(String[] docVersions, String[] migrationVersions, String[] productVersions) {
         String[] docAndMigrationVersions = new String[docVersions.length + migrationVersions.length];
         System.arraycopy(docVersions, 0, docAndMigrationVersions, 0, docVersions.length);
         System.arraycopy(migrationVersions, 0, docAndMigrationVersions, docVersions.length, migrationVersions.length);
@@ -228,49 +207,11 @@ public class JiraChecker {
             sb.append(i).append(") ").append(queryNames[i - 1]).append("\n").append("\t").append(query.toPattern()).append("\n");
             i++;
         }
-        sb.append(i).append(") ").append(doubleQueryName).append("\n").append("\t").append(doubleQuery1.toPattern()).append("\n").append(doubleQuery2.toPattern()).append("\n");
-        i++;
+        if(doubleQueryName.length()>0) {
+            sb.append(i).append(") ").append(doubleQueryName).append("\n").append("\t").append(doubleQuery1.toPattern()).append("\n").append(doubleQuery2.toPattern()).append("\n");
+        }
 
         return sb.toString();
-    }
-
-    public static void main(String[] args) {
-
-        // Common
-        JiraChecker jiraChecker = new JiraChecker();
-
-        System.out.println("Bonjour Jira Checkers,\n\n\tNous sommes le "+new Date()+".\n\n");
-
-
-
-        String[] queryNames = new String[]{"bugs with earliestAffectedVersion > fixVersion", "bugs with affectversion < earliestAffectedVersion", "bugs with wrong issueFiexdIn = Development", "bugs with wrong issueFiexdIn = Released version", "bugs with affectVersion > fixversion"};
-        List<String> queries = Arrays.asList(" AND fixVersion = {0} AND AffectedVersion > {0}",  "AND affectedVersion = {0} AND \"Earliest Affected Version\" > {0}", " AND fixVersion = {0} AND \"Earliest Affected Version\" != {0} AND \"Issue impacting\" = Development", " AND affectedVersion >= 1.0.0 AND fixVersion = {0} AND \"Earliest Affected Version\" = {0} AND \"Issue impacting\" =  \"Released version\" ", " AND affectedVersion = {0} AND fixVersion is not EMPTY and fixVersion != \"N/A\" AND fixVersion < {0} ");
-
-        String doubleQueryName = "missing affect version";
-        String doubleQuery1 = " AND affectedVersion != {0} AND \"Earliest Affected Version\" <= {0} AND (fixVersion > {0} OR fixVersion is EMPTY OR fixVersion = \"N/A\") ORDER BY key DESC";
-        String doubleQuery2 = " AND affectedVersion != {0} AND \"Earliest Affected Version\" <= {0} AND (fixVersion <= {0} and fixVersion != \"N/A\") AND key in ({1}) ORDER BY key DESC";
-
-
-        // Check for documentation
-        String[] versions = new String[]{"Doc-6.0", "Doc-6.1", "Doc-6.2", "Doc-6.3", "Doc-6.4"};
-        String queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND affectedVersion < 1.0.0";
-        jiraChecker.check("Documentation Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
-
-        // Check for product
-        versions = new String[]{"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.1.0", "6.1.1", "6.1.2", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.3.0", "6.3.1", "6.3.2", "6.3.3", "6.3.4", "6.3.5", "6.3.6", "6.3.7"};
-        queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= 6.0.0";
-        jiraChecker.check("Product Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
-
-        // Product - Missing minor versions
-        jiraChecker.checkProductMissingMinorVersion(jiraChecker);
-
-        // Check for migration
-        versions = new String[]{"1.0.0", "1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.8.1", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0"};
-        queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= 1.0.0 AND affectedVersion < 6.0.0";
-        jiraChecker.check("Product Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
-
-        System.out.println("\n\n\tBon nettoyage!");
-
     }
 
     private void checkProductMissingMinorVersion(JiraChecker jiraChecker) {
@@ -327,60 +268,40 @@ public class JiraChecker {
         return result;
     }
 
-    private static void checkAll() {
-        //,"6.4"
-        String[] queryNames = new String[]{"bugs with earliestAffectedVersion > fixVersion", "bugs with affectversion < earliestAffectedVersion", "bugs with wrong issueFiexdIn = Development", "bugs with wrong issueFiexdIn = Released version", "bugs with affectVersion > fixversion"};
+    public static void main(String[] args) {
 
-        String[] docVersions = new String[]{"Doc-6.0", "Doc-6.1", "Doc-6.2", "Doc-6.3", "Doc-6.4"};
-        String[] migrationVersions = new String[]{"1.0.0", "1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.8.1", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0"};
-        String[] productVersions = new String[]{"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.1.0", "6.1.1", "6.1.2", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.3.0", "6.3.1", "6.3.2", "6.3.3", "6.3.4", "6.3.5", "6.3.6", "6.3.7"};
-
-//        String[] docVersions = new String[]{};
-//        String[] migrationVersions = new String[]{};
-//        String[] productVersions = new String[]{"6.3.7"};
-
-
-        MessageFormat[] queries = new MessageFormat[]{
-//                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND (fixVersion > {0} OR fixVersion is EMPTY OR fixVersion = \"N/A\") AND \"Earliest Affected Version\" <= {0} AND affectedVersion != {0}")
-//                ,
-//                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND fixVersion = {0} AND AffectedVersion > {0}")
-//                ,
-//                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND affectedVersion = {0} AND \"Earliest Affected Version\" > {0}")
-//                ,
-//                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND fixVersion = {0} AND \"Earliest Affected Version\" != {0} AND \"Issue impacting\" = Development")
-//                ,
-//                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND affectedVersion >= 1.0.0 AND fixVersion = {0} AND \"Earliest Affected Version\" = {0} AND \"Issue impacting\" =  \"Released version\" ")
-//                ,
-//                new MessageFormat("project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND affectedVersion = {0} AND fixVersion is not EMPTY and fixVersion != \"N/A\" AND fixVersion < {0} ")
-        };
-
-
-        String[] doubleQueryNames = new String[]{"missing affect version" };
-        MessageFormat[] doubleQueries = new MessageFormat[]{new MessageFormat("project = \"Bonita BPM\" \n" +
-                "AND \n" +
-                "issuetype in (bug) \n" +
-                "AND \n" +
-                "(resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) \n" +
-                "AND affectedVersion >= Doc-6.0 \n" +
-                "AND affectedVersion != {0} \n" +
-                "AND \"Earliest Affected Version\" <= {0} \n" +
-                "AND (fixVersion > {0} OR fixVersion is EMPTY OR fixVersion = \"N/A\") \n" +
-                "ORDER BY key DESC"),
-                new MessageFormat("project = \"Bonita BPM\" \n" +
-                        "AND \n" +
-                        "issuetype in (bug) \n" +
-                        "AND \n" +
-                        "(resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) \n" +
-                        "AND affectedVersion >= Doc-6.0 \n" +
-                        "AND affectedVersion != {0} \n" +
-                        "AND \"Earliest Affected Version\" <= {0} \n" +
-                        "AND (fixVersion <= {0} and fixVersion != \"N/A\")\n" +
-                        "AND key in ({1}) \n" +
-                        "ORDER BY key DESC")};
-
+        // Common
         JiraChecker jiraChecker = new JiraChecker();
-        jiraChecker.check(docVersions, migrationVersions, productVersions, queryNames, queries, doubleQueryNames[0], doubleQueries[0], doubleQueries[1]);
-    }
 
+        System.out.println("Bonjour Jira Checkers,\n\n\tNous sommes le "+new Date()+".\n\n");
+
+        String[] queryNames = new String[]{"bugs with earliestAffectedVersion > fixVersion", "bugs with affectversion < earliestAffectedVersion", "bugs with wrong issueFiexdIn = Development", "bugs with wrong issueFiexdIn = Released version", "bugs with affectVersion > fixversion"};
+        List<String> queries = Arrays.asList(" AND fixVersion = {0} AND AffectedVersion > {0}",  "AND affectedVersion = {0} AND \"Earliest Affected Version\" > {0}", " AND fixVersion = {0} AND \"Earliest Affected Version\" != {0} AND \"Issue impacting\" = Development", " AND affectedVersion >= 1.0.0 AND fixVersion = {0} AND \"Earliest Affected Version\" = {0} AND \"Issue impacting\" =  \"Released version\" ", " AND affectedVersion = {0} AND fixVersion is not EMPTY and fixVersion != \"N/A\" AND fixVersion < {0} ");
+
+        String doubleQueryName = "missing affect version";
+        String doubleQuery1 = " AND affectedVersion != {0} AND \"Earliest Affected Version\" <= {0} AND (fixVersion > {0} OR fixVersion is EMPTY OR fixVersion = \"N/A\") ORDER BY key DESC";
+        String doubleQuery2 = " AND affectedVersion != {0} AND \"Earliest Affected Version\" <= {0} AND (fixVersion <= {0} and fixVersion != \"N/A\") AND key in ({1}) ORDER BY key DESC";
+
+        // Check for documentation
+        String[] versions = new String[]{"Doc-6.0", "Doc-6.1", "Doc-6.2", "Doc-6.3", "Doc-6.4"};
+        String queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND affectedVersion < 1.0.0";
+        jiraChecker.check("Documentation Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
+
+        // Check for product
+        versions = new String[]{"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.1.0", "6.1.1", "6.1.2", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.3.0", "6.3.1", "6.3.2", "6.3.3", "6.3.4", "6.3.5", "6.3.6", "6.3.7"};
+        queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= 6.0.0";
+        jiraChecker.check("Product Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
+
+        // Product - Missing minor versions
+        jiraChecker.checkProductMissingMinorVersion(jiraChecker);
+
+        // Check for migration
+        versions = new String[]{"1.0.0", "1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.8.1", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0"};
+        queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= 1.0.0 AND affectedVersion < 6.0.0";
+        jiraChecker.check("Product Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
+
+        System.out.println("\n\n\tBon nettoyage!");
+
+    }
 
 }
