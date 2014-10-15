@@ -12,43 +12,6 @@
 			<artifactId>jira-rest-java-client</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<!-- Connector to MySQL database that will store extracted Jira issues -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.6</version>
-		</dependency>
-
-		<!-- Hibernate will be used to manage persistency -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<version>3.6.7.Final</version>
-		</dependency>
-
-		<!-- Because this is a web app, we also have a dependency on the servlet 
-			api. -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-		</dependency>
-
-		<!-- Hibernate uses slf4j for logging, for our purposes here use the simple 
-			backend -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.2</version>
-		</dependency>
-
-		<!-- Hibernate gives you a choice of bytecode providers between cglib and 
-			javassist -->
-		<dependency>
-			<groupId>javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.12.1.GA</version>
-		</dependency>
 
 		<!-- Unit testing dependency -->
 		<dependency>
@@ -62,11 +25,11 @@
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.5</version>
 		</dependency>
-		<dependency>
-			<groupId>org.easytesting</groupId>
-			<artifactId>fest-assert</artifactId>
-			<version>1.4</version>
-		</dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>1.5.0</version>
+        </dependency>
 	</dependencies>
 
 	<repositories>
