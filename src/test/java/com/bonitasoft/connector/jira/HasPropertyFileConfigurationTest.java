@@ -26,7 +26,7 @@ public class HasPropertyFileConfigurationTest {
 	}
 	
 	public static void ensureValidConfiguration() {
-		URL confFileURL = HasPropertyFileConfigurationTest.class.getClassLoader().getResource("jiraExtractor.cfg");
+		URL confFileURL = HasPropertyFileConfigurationTest.class.getClassLoader().getResource("jiraChecker.cfg");
 		final String filePath = confFileURL.getPath();
 		System.setProperty(CONFIGURATION_FILENAME_KEY, filePath);
 	}

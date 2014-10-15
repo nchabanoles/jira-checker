@@ -39,7 +39,7 @@ public class JiraChecker {
 
 
     private void ensureValidConfiguration() {
-        URL confFileURL = JiraChecker.class.getClassLoader().getResource("jiraExtractor.cfg");
+        URL confFileURL = JiraChecker.class.getClassLoader().getResource("jiraChecker.cfg");
         final String filePath = confFileURL.getPath();
         System.setProperty(CONFIGURATION_FILENAME_KEY, filePath);
     }
