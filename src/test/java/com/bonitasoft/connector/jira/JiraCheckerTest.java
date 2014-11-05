@@ -3,27 +3,33 @@ package com.bonitasoft.connector.jira;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.domain.BasicIssue;
 import com.atlassian.jira.rest.client.domain.SearchResult;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
-import javax.swing.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * Created by Nicolas Chabanoles on 07/10/14.
  */
 public class JiraCheckerTest {
 
+
+    static {
+        if(System.getProperty(JiraChecker.CONFIGURATION_FILENAME_KEY) == null) {
+            URL confFileURL = JiraCheckerTest.class.getClassLoader().getResource("jiraChecker.cfg");
+            final String filePath = confFileURL.getPath();
+            System.setProperty(JiraChecker.CONFIGURATION_FILENAME_KEY, filePath);
+        }
+    }
 
     @Test
     public void shouldSeparateDocVersionsFromProductVersions() {

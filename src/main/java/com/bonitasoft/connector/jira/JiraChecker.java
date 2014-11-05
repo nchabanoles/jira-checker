@@ -20,7 +20,6 @@ public class JiraChecker {
     private final JiraClient jiraClient;
 
     public JiraChecker() {
-        ensureValidConfiguration();
 
         JiraConfiguration config = null;
         try {
@@ -37,12 +36,6 @@ public class JiraChecker {
         jiraClient = client;
     }
 
-
-    private void ensureValidConfiguration() {
-        URL confFileURL = JiraChecker.class.getClassLoader().getResource("jiraChecker.cfg");
-        final String filePath = confFileURL.getPath();
-        System.setProperty(CONFIGURATION_FILENAME_KEY, filePath);
-    }
 
     private String buildResultList(MessageFormat[] queries, MessageFormat doubleQuery1, MessageFormat doubleQuery2, String[] versions) {
         int i = 1;
@@ -269,6 +262,14 @@ public class JiraChecker {
     }
 
     public static void main(String[] args) {
+
+
+        if(System.getProperty(CONFIGURATION_FILENAME_KEY) == null) {
+            System.out.println("No configuration file specified using System Property: " + CONFIGURATION_FILENAME_KEY + " . Using defaults.");
+            URL confFileURL = JiraChecker.class.getClassLoader().getResource("jiraChecker.cfg");
+            final String filePath = confFileURL.getPath();
+            System.setProperty(CONFIGURATION_FILENAME_KEY, filePath);
+        }
 
         // Common
         JiraChecker jiraChecker = new JiraChecker();
