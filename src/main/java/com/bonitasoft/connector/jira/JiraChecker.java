@@ -215,12 +215,12 @@ public class JiraChecker {
         System.out.println("\t\t\t1) project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.0.0 and fixVersion < 6.1.0 and fixVersion not in (6.1.0) and \"Issue impacting\" = \"Released Version\"\n");
         System.out.println("\t\t\t2) project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.1.0 and fixVersion < 6.2.0 and fixVersion not in (6.2.0) and \"Issue impacting\" = \"Released Version\"\n");
         System.out.println("\t\t\t3) project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.2.0 and fixVersion < 6.3.0 and fixVersion not in (6.3.0) and \"Issue impacting\" = \"Released Version\"\n");
-        System.out.println("\t\t\t4) project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.3.0 and fixVersion < 6.4.0 and fixVersion not in (6.4.0, 6.4.0-alpha-01) and \"Issue impacting\" = \"Released Version\"\n");
+        System.out.println("\t\t\t4) project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.3.0 and fixVersion < 6.4.0 and fixVersion not in (6.4.0) and \"Issue impacting\" = \"Released Version\"\n");
 
         int resultCount610 = jiraChecker.getResultCount(new MessageFormat("project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.0.0 and fixVersion < {0} and fixVersion not in ({0}) and \"Issue impacting\" = \"Released Version\""), "6.1.0");
         int resultCount620 = jiraChecker.getResultCount(new MessageFormat("project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.1.0 and fixVersion < {0} and fixVersion not in ({0}) and \"Issue impacting\" = \"Released Version\""), "6.2.0");
         int resultCount630 = jiraChecker.getResultCount(new MessageFormat("project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.2.0 and fixVersion < {0} and fixVersion not in ({0}) and \"Issue impacting\" = \"Released Version\""), "6.3.0");
-        int resultCount640 = jiraChecker.getResultCount(new MessageFormat("project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.3.0 and fixVersion < {0} and fixVersion not in (6.4.0, 6.4.0-alpha-01) and \"Issue impacting\" = \"Released Version\""), "6.4.0");
+        int resultCount640 = jiraChecker.getResultCount(new MessageFormat("project = \"Bonita BPM\" AND issuetype = bug AND affectedVersion in releasedVersions() and fixVersion > 6.3.0 and fixVersion < {0} and fixVersion not in (6.4.0) and \"Issue impacting\" = \"Released Version\""), "6.4.0");
 
         System.out.println("\t1) 6.1.0 --> " + resultCount610);
         System.out.println("\t2) 6.2.0 --> " + resultCount620);
@@ -289,7 +289,7 @@ public class JiraChecker {
         jiraChecker.check("Documentation Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
 
         // Check for product
-        versions = new String[]{"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.1.0", "6.1.1", "6.1.2", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.3.0", "6.3.1", "6.3.2", "6.3.3", "6.3.4", "6.3.5", "6.3.6", "6.3.7"};
+        versions = new String[]{"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.1.0", "6.1.1", "6.1.2", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.3.0", "6.3.1", "6.3.2", "6.3.3", "6.3.4", "6.3.5", "6.3.6", "6.3.7", "6.3.8", "6.3.9"};
         queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= 6.0.0";
         jiraChecker.check("Product Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
 
@@ -297,7 +297,7 @@ public class JiraChecker {
         jiraChecker.checkProductMissingMinorVersion(jiraChecker);
 
         // Check for migration
-        versions = new String[]{"1.0.0", "1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.8.1", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0"};
+        versions = new String[]{"1.0.0", "1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.8.1", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0", "1.15.0", "1.16.0"};
         queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= 1.0.0 AND affectedVersion < 6.0.0";
         jiraChecker.check("Product Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
 
