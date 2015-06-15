@@ -284,12 +284,12 @@ public class JiraChecker {
         String doubleQuery2 = " AND affectedVersion != {0} AND \"Earliest Affected Version\" <= {0} AND (fixVersion <= {0} and fixVersion != \"N/A\") AND key in ({1}) ORDER BY key DESC";
 
         // Check for documentation
-        String[] versions = new String[]{"Doc-6.0", "Doc-6.1", "Doc-6.2", "Doc-6.3", "Doc-6.4"};
+        String[] versions = new String[]{"Doc-6.0", "Doc-6.1", "Doc-6.2", "Doc-6.3", "Doc-6.4", "Doc-6.5"};
         String queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= Doc-6.0 AND affectedVersion < 1.0.0";
         jiraChecker.check("Documentation Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
 
         // Check for product
-        versions = new String[]{"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.1.0", "6.1.1", "6.1.2", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.3.0", "6.3.1", "6.3.2", "6.3.3", "6.3.4", "6.3.5", "6.3.6", "6.3.7", "6.3.8", "6.3.9"};
+        versions = new String[]{"6.0.0", "6.0.1", "6.0.2", "6.0.3", "6.0.4", "6.1.0", "6.1.1", "6.1.2", "6.2.0", "6.2.1", "6.2.2", "6.2.3", "6.2.4", "6.2.5", "6.2.6", "6.3.0", "6.3.1", "6.3.2", "6.3.3", "6.3.4", "6.3.5", "6.3.6", "6.3.7", "6.3.8", "6.3.9", "6.4.0", "6.4.1", "6.4.2", "6.5.0", "6.5.1", "6.5.2"};
         queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= 6.0.0";
         jiraChecker.check("Product Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
 
@@ -297,7 +297,7 @@ public class JiraChecker {
         jiraChecker.checkProductMissingMinorVersion(jiraChecker);
 
         // Check for migration
-        versions = new String[]{"1.0.0", "1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.8.1", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0", "1.15.0", "1.16.0"};
+        versions = new String[]{"1.0.0", "1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.3.0", "1.3.1", "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.8.1", "1.9.0", "1.10.0", "1.11.0", "1.12.0", "1.13.0", "1.14.0", "1.15.0", "1.16.0", "1.17.0", "1.18.0", "1.19.0", "1.20.0", "1.21.0", "1.22.0"};
         queryPrefix = "project = \"Bonita BPM\" AND issuetype in (bug) AND (resolution not in (Duplicate, \"Not a bug\", \"Cannot Reproduce\", Rejected) OR resolution is EMPTY) AND affectedVersion >= 1.0.0 AND affectedVersion < 6.0.0";
         jiraChecker.check("Product Issues:", queryPrefix, versions, queryNames, queries, doubleQueryName, doubleQuery1, doubleQuery2);
 
