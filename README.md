@@ -1,6 +1,6 @@
 jira-checker
 ============
-JQL queries runner using Jira Rest Client.
+JQL queries runner using Jira Rest Client v1.0.
 
 To be executed it requires a configuration file in Classpath named **jiraChecker.cfg** containing the following information:
 
